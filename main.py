@@ -15,3 +15,4 @@ p = 'aaaaaaaabbbcccdddeeefffggghhhiii'
 print(histograma(p, a))
 
 # 3 - aplicar a todas as fontes
+#Hello
