@@ -1,4 +1,7 @@
-def histograma(p, a): # (fonte, alfabeto)
+import matplotlib.pyplot as plt
+
+def histograma(a, p): # (fonte, alfabeto)
+    # calcula o histograma
     histo = {}
     for letra in p:
         if letra in a:
@@ -6,14 +9,20 @@ def histograma(p, a): # (fonte, alfabeto)
                 histo[letra] += 1
             else:
                 histo[letra] = 1
-    return histo
+
+    print(histo)
+
+    # mostra o histograma gráfico
+    plt.bar(histo.keys(), histo.values())
+    plt.show()
 
 a = 'abcdefghijklmnopqrstuvwxyz'
-
 p = 'aaaaaaaabbbcccdddeeefffggghhhiii'
 
-print(histograma(p, a))
+histograma(a, p)
 
-# 3 - aplicar a todas as fontes
-# 0 - 255 (cada elemento - 1 byte : num medio por simbolo 8 bits)
-# estudar o quanto é que nós conseguimos comprimir (valor mais baixo que teóricamente conseguimos atingir)
+
+#! vvv Ignorar vvv 
+#* 3 - aplicar a todas as fontes (img, text, wav)
+#* 0 - 255 (cada elemento - 1 byte : num medio por simbolo 8 bits)
+#* estudar o quanto é que nós conseguimos comprimir (valor mais baixo que teóricamente conseguimos atingir)
