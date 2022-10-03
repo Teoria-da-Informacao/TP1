@@ -17,7 +17,7 @@ def histograma(a, p): # (fonte, alfabeto)
     plt.show()
 
 a = 'abcdefghijklmnopqrstuvwxyz'
-p = 'aaaaaaaabbbcccdddeeefffggghhhiii'
+p = 'aaaaaaaabbbbbccccddddddeeeeeeeeeffghhhiiiiiiiiiii'
 
 histograma(a, p)
 
