@@ -1,26 +1,46 @@
 import matplotlib.pyplot as plt
+import math
 
+# ex 1
 def histograma(a, p): # (fonte, alfabeto)
-    # calcula o histograma
-    histo = {}
-    for letra in p:
-        if letra in a:
-            if letra in histo:
-                histo[letra] += 1
-            else:
-                histo[letra] = 1
+    histo = {letra: 0 for letra in a}
 
+    for letra in p:
+        if letra in a and letra in histo:
+            histo[letra] += 1
+            
+    # mostra o histograma na consola
     print(histo)
 
     # mostra o histograma gráfico
     plt.bar(histo.keys(), histo.values())
     plt.show()
 
-a = 'abcdefghijklmnopqrstuvwxyz'
-p = 'aaaaaaaabbbbbccccddddddeeeeeeeeeffghhhiiiiiiiiiii'
 
-histograma(a, p)
+# ex 2
+def entropia(a, p):
+    entropia = 0
 
+    for letra in p:
+        if letra in a:
+            entropia += ((1/len(p)) * math.log2(1/len(p)))
+
+    # valor calculado em cima é negativo, mas nós queremos o módulo!!
+    entropia = abs(entropia)
+
+    # mostra o valor da entropia na consola
+    print(entropia)
+
+
+def main():
+    a = 'abcdefghijklmnopqrstuvwxyz'
+    p = 'aaaaaaaabbbbbccccddddddeeeeeeeeeffghhhiiiiiiiiiii'
+
+    histograma(a, p)
+    entropia(a, p)
+
+
+main()
 
 #! vvv Ignorar vvv 
 #* 3 - aplicar a todas as fontes (img, text, wav)
