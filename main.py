@@ -4,17 +4,16 @@ import matplotlib.image as mpimg
 from scipy.io import wavfile
 
 #! ex 1
-def histograma(a, p): # (alfabeto, fonte)
+def histograma(a, p, src): # (alfabeto, fonte)
     histo = {letra: 0 for letra in a}
     for letra in p:
-        print(letra, end='')
         if letra in a and letra in histo:
             histo[letra] += 1
-            
-    # mostra o histograma na consola
-    print(histo)
+
+    print(histo) # mostra o histograma na consola como se fosse dicionário
 
     # mostra o histograma gráfico
+    plt.title(src)
     plt.bar(histo.keys(), histo.values())
     plt.show()
 
@@ -36,7 +35,8 @@ def analyseImage(src):
     img = mpimg.imread(src)
     p = [chr(pixel) for pixel in img[0]] # põe cada pixel convertido para caracter no array
 
-    histograma(a, p)
+    src = src.replace('./src/', '')
+    histograma(a, p, src)
     print(f"Entropia {src.replace('./src/', '')}: {entropia(a, p)}")
 
 def analyseWav(src):
@@ -49,7 +49,8 @@ def analyseWav(src):
     # possivelmente depois dar delete ao temp >>> del temp 
     p = [chr(frame) for frame in data] # põe cada frame convertido para caracter no array
     
-    histograma(a, p)
+    src = src.replace('./src/', '')
+    histograma(a, p, src)
     print(f"Entropia {src.replace('./src/', '')}: {entropia(a, p)}")
 
 def analyseTxt(src):
@@ -57,8 +58,9 @@ def analyseTxt(src):
 
     p = open('./src/lyrics.txt', 'r').read() # string com todo o texto
 
-    histograma(a, p) # aqui vai percorrer a string como se fosse um array
-    print(f"Entropia {src.replace('./src/', '')}: {entropia(a, p)}")
+    src = src.replace('./src/', '')
+    histograma(a, p, src) # aqui vai percorrer a string como se fosse um array
+    print(f"Entropia {src}: {entropia(a, p)}")
 
 
 #!              ------   Main    ------
