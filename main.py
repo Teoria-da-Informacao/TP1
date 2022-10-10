@@ -15,16 +15,26 @@ def histograma(a, p, src): # (alfabeto, fonte)
     # mostra o histograma gráfico
     plt.title(src)
     plt.bar(histo.keys(), histo.values())
+    
+    plt.xticks([])
+    # plt.yticks([letra for letra in histo if histo[letra] > 0])
+
+    # abre janela maximizada
+    mng = plt.get_current_fig_manager()
+    mng.resize(*mng.window.maxsize())
+
     plt.show()
+
+    return histo # return dicionário
 
 
 #! ex 2
-def entropia(a, p):
+def entropia(histo, p):
     entropia = 0
 
-    for letra in p:
-        if letra in a:
-            entropia += ((1/len(p)) * math.log2(1/len(p)))
+    for letra in histo:
+        if histo[letra] != 0:
+            entropia += ((histo[letra] / len(p)) * math.log2(histo[letra] / len(p)))
 
     return abs(entropia) # return da entropia em modulo, porque em cima é calculado com valor negativo
 
@@ -36,8 +46,8 @@ def analyseImage(src):
     p = [chr(pixel) for pixel in img[0]] # põe cada pixel convertido para caracter no array
 
     src = src.replace('./src/', '')
-    histograma(a, p, src)
-    print(f"Entropia {src.replace('./src/', '')}: {entropia(a, p)}")
+    histo = histograma(a, p, src)
+    print(f"Entropia {src.replace('./src/', '')}: {entropia(histo, p)}")
 
 def analyseWav(src):
     #TODO: not sure mas se for este o alfabeto então não está a funcionar como deveria
@@ -50,8 +60,8 @@ def analyseWav(src):
     p = [chr(frame) for frame in data] # põe cada frame convertido para caracter no array
     
     src = src.replace('./src/', '')
-    histograma(a, p, src)
-    print(f"Entropia {src.replace('./src/', '')}: {entropia(a, p)}")
+    histo = histograma(a, p, src)
+    print(f"Entropia {src.replace('./src/', '')}: {entropia(histo, p)}")
 
 def analyseTxt(src):
     a = [chr(i) for i in range(65, 91)] + [chr(i) for i in range(97, 123)] # alfabeto de a-zA-Z para .txt
@@ -59,8 +69,8 @@ def analyseTxt(src):
     p = open('./src/lyrics.txt', 'r').read() # string com todo o texto
 
     src = src.replace('./src/', '')
-    histograma(a, p, src) # aqui vai percorrer a string como se fosse um array
-    print(f"Entropia {src}: {entropia(a, p)}")
+    histo = histograma(a, p, src) # aqui vai percorrer a string como se fosse um array
+    print(f"Entropia {src}: {entropia(histo, p)}")
 
 
 #!              ------   Main    ------
@@ -75,11 +85,10 @@ def main():
     # MRIbin
     analyseImage('./src/MRIbin.bmp')
 
-
     '''Section for .wav files'''
     # TODO: Make alphabet for wav files
     # soundMono
-    analyseWav('./src/soundMono.wav')
+    # analyseWav('./src/soundMono.wav')
 
     '''Section for .txt files'''
     # lyrics
