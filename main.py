@@ -6,22 +6,19 @@ from scipy.io import wavfile
 import numpy as np
 
 #! ex 1
-def histograma(a, p, src): # (alfabeto, fonte)
+def histograma(a, fonte, src): # (alfabeto, fonte, src)
     histo = {letra: 0 for letra in a}
-    for letra in p:
-        if letra in a and letra in histo:
-            histo[letra] += 1
-
-    '''print(histo) # mostra o histograma na consola como se fosse dicionário'''
+    fonte = Counter(fonte)
+    
+    for letra in fonte:
+        if letra in a:
+            histo[letra] = fonte[letra]
 
     # mostra o histograma gráfico
     plt.title(src)
+
     plt.bar(histo.keys(), histo.values())
     
-    # Esconde label x
-    # plt.xticks([])
-    # plt.yticks([letra for letra in histo if histo[letra] > 0])
-
     # abre janela maximizada
     mng = plt.get_current_fig_manager()
     mng.resize(*mng.window.maxsize())
@@ -31,39 +28,29 @@ def histograma(a, p, src): # (alfabeto, fonte)
     return histo # return dicionário
 
 #! ex 2
-def entropia(histo, p):
+def entropia(histo, fonte):
     entropia = 0
 
-    for letra in histo:
-        if histo[letra] != 0:
-            entropia += ((histo[letra] / len(p)) * math.log2(histo[letra] / len(p)))
+    # TODO: (histo[letra]/len(fonte))*math.log2(histo[letra]/len(fonte))
+    entropia = sum([-(histo[letra]/len(fonte))*math.log2(histo[letra]/len(fonte)) for letra in histo if histo[letra] != 0])
 
     return abs(entropia) # return da entropia em modulo, porque em cima é calculado com valor negativo
 
 #! ex 3
 def analyseImage(src):
-    a = [chr(i) for i in range(256)] # alfabeto com todos os caracters para .bmp
+    a = [i for i in range(256)] # alfabeto com todos os caracters para .bmp
 
     img = mpimg.imread(src)
-    p = [chr(pixel) for pixel in img[0]] # põe cada pixel convertido para caracter no array
+    fonte = img.flatten() # transforma a imagem em array
 
     src = src.replace('./src/', '')
-    histo = histograma(a, p, src)
-    print(f"\nEntropia {src.replace('./src/', '')}: {entropia(histo, p)}\n")
+    histo = histograma(a, fonte, src)
+    print(f"\nEntropia {src.replace('./src/', '')}: {entropia(histo, fonte)}\n")
 
 def analyseWav(src):
-    #TODO: not sure mas se for este o alfabeto então não está a funcionar como deveria
-    # a = [i/100 for i in range(-100, 100)] # alfabeto de som no intervalo [-1, 1[ para .wav
-    # np.arrange
+    a = [i for i in range(256)] # alfabeto de som no intervalo [-1, 1[ para .wav'
 
     [temp, data] = wavfile.read(src)
-    data = data / np.iinfo(data.dtype).max # normaliza os dados para o intervalo [-1, 1[
-    d = (1 - (-1)) / (2**data.itemsize)
-    a = np.arange(-1, 1, d)
-    
-    print(a)
-    print('------')
-    print(data)
     
     src = src.replace('./src/', '')
     histo = histograma(a, data, src)
@@ -72,32 +59,31 @@ def analyseWav(src):
 def analyseTxt(src):
     a = [chr(i) for i in range(65, 91)] + [chr(i) for i in range(97, 123)] # alfabeto de a-zA-Z para .txt
 
-    p = open('./src/lyrics.txt', 'r').read() # string com todo o texto
+    fonte = open('./src/lyrics.txt', 'r').read() # string com todo o texto
 
     src = src.replace('./src/', '')
-    histo = histograma(a, p, src) # aqui vai percorrer a string como se fosse um array
-    print(f"Entropia {src}: {entropia(histo, p)}")
+    histo = histograma(a, fonte, src) # aqui vai percorrer a string como se fosse um array
+    print(f"Entropia {src}: {entropia(histo, fonte)}")
 
 
 #!              ------   Main    ------
 def main():
     '''Section for .bmp files'''
     # landscape
-    # analyseImage('./src/landscape.bmp')
+    analyseImage('./src/landscape.bmp')
 
     # MRI
-    # analyseImage('./src/MRI.bmp')
+    analyseImage('./src/MRI.bmp')
     
     # MRIbin
-    # analyseImage('./src/MRIbin.bmp')
+    analyseImage('./src/MRIbin.bmp')
 
     '''Section for .wav files'''
-    # TODO: Make alphabet for wav files
     # soundMono
     analyseWav('./src/soundMono.wav')
 
     '''Section for .txt files'''
     # lyrics
-    # analyseTxt('./src/lyrics.txt')
+    analyseTxt('./src/lyrics.txt')
 
 main()
