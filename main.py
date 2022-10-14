@@ -1,6 +1,5 @@
 from typing import Counter
 import matplotlib.pyplot as plt
-import math
 import matplotlib.image as mpimg
 from scipy.io import wavfile
 import numpy as np
@@ -29,11 +28,8 @@ def histograma(a, fonte, src): # (alfabeto, fonte, src)
 
 #! ex 2
 def entropia(histo, fonte):
-    entropia = 0
-
-    # TODO: (histo[letra]/len(fonte))*math.log2(histo[letra]/len(fonte))
-    entropia = sum([-(histo[letra]/len(fonte))*math.log2(histo[letra]/len(fonte)) for letra in histo if histo[letra] != 0])
-
+    arr = np.array(list(histo.values()))
+    entropia = np.sum((arr/len(fonte)) * np.log2(arr/len(fonte)))
     return abs(entropia) # return da entropia em modulo, porque em cima é calculado com valor negativo
 
 #! ex 3
@@ -48,13 +44,13 @@ def analyseImage(src):
     print(f"\nEntropia {src.replace('./src/', '')}: {entropia(histo, fonte)}\n")
 
 def analyseWav(src):
-    a = [i for i in range(256)] # alfabeto de som no intervalo [-1, 1[ para .wav'
+    a = [i for i in range(256)]
 
     [temp, data] = wavfile.read(src)
     
     src = src.replace('./src/', '')
     histo = histograma(a, data, src)
-    print(f"Entropia {src.replace('./src/', '')}: {entropia(histo, data)}")
+    print(f"\nEntropia {src.replace('./src/', '')}: {entropia(histo, data)}\n")
 
 def analyseTxt(src):
     a = [chr(i) for i in range(65, 91)] + [chr(i) for i in range(97, 123)] # alfabeto de a-zA-Z para .txt
@@ -63,7 +59,7 @@ def analyseTxt(src):
 
     src = src.replace('./src/', '')
     histo = histograma(a, fonte, src) # aqui vai percorrer a string como se fosse um array
-    print(f"Entropia {src}: {entropia(histo, fonte)}")
+    print(f"\nEntropia {src}: {entropia(histo, fonte)}\n")
 
 
 #!              ------   Main    ------
