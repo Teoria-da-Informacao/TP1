@@ -4,18 +4,19 @@ import matplotlib.image as mpimg
 from scipy.io import wavfile
 import numpy as np
 
+from Classes.huffmancodec import *
+
 #! ex 1
 def histograma(a, fonte, src): # (alfabeto, fonte, src)
     histo = {letra: 0 for letra in a}
     fonte = Counter(fonte)
     
     for letra in fonte:
-        if letra in a:
+        if letra in a: # não necessário pois o alfabeto já é o conjunto de letras da fonte
             histo[letra] = fonte[letra]
 
     # mostra o histograma gráfico
     plt.title(src)
-
     plt.bar(histo.keys(), histo.values())
     
     # abre janela maximizada
@@ -28,58 +29,70 @@ def histograma(a, fonte, src): # (alfabeto, fonte, src)
 
 #! ex 2
 def entropia(histo, fonte):
-    arr = np.array(list(histo.values()))
-    entropia = np.sum((arr/len(fonte)) * np.log2(arr/len(fonte)))
-    return abs(entropia) # return da entropia em modulo, porque em cima é calculado com valor negativo
+    # remove todos os zeros dos valores do histograma no caso de existirem
+    if 0 in histo.values():
+        histo = {k: v for k, v in histo.items() if v != 0}
+
+    p_i = np.array(list(histo.values()))/len(fonte)
+
+    return -np.sum(p_i*np.log2(p_i))
+
 
 #! ex 3
-def analyseImage(src):
-    a = [i for i in range(256)] # alfabeto com todos os caracters para .bmp
+def getFonte(src):
+    if src.endswith('.bmp'):
+        fonte = mpimg.imread(src).flatten()
+    elif src.endswith('.wav'):
+        [temp, fonte] = wavfile.read(src)
+    elif src.endswith('.txt'):
+        fonte = open('./src/lyrics.txt', 'r').read()
+        fonte = [i for i in fonte if i.isalpha()] # remove todos os caracteres que não são letras (não é optimizado)
+    return fonte
 
-    img = mpimg.imread(src)
-    fonte = img.flatten() # transforma a imagem em array
+def analyseFile(src):
+    fonte = getFonte(src)
+    a = [i for i in range(256)] if not src.endswith('.txt') else [chr(i) for i in range(65, 91)] + [chr(i) for i in range(97, 123)]
 
     src = src.replace('./src/', '')
     histo = histograma(a, fonte, src)
-    print(f"\nEntropia {src.replace('./src/', '')}: {entropia(histo, fonte)}\n")
+    print(f"Entropia {src}: {entropia(histo, fonte)}")
 
-def analyseWav(src):
-    a = [i for i in range(256)]
+#! ex 4
+def analyseHuffman(src):
+    fonte = getFonte(src)
+    codec = HuffmanCodec.from_data(fonte)
+    t = codec.get_code_table()
+    # print(t)
+    symbols, lenght = codec.get_code_len()
+    # print(symbols)
+    # print(lenght)
+    media = sum(lenght)/len(lenght)
+    print(f"Media: {media}\n")
 
-    [temp, data] = wavfile.read(src)
-    
+#! ex 5
+def analyseFilePairs(src):
+    fonte = getFonte(src)
+    fonte = [str(fonte[i]) + str(fonte[i+1]) for i in range(0, len(fonte)-1, 2)] # demora um bocadinho lol
+
+    # gera alfabeto com todos os pares possíveis
+    a = [] if not src.endswith('.txt') else [chr(i) + chr(j) for i in range(65, 91) for j in range(65, 91) ] + [chr(i) + chr(j) for i in range(97, 123) for j in range(97, 123) if i != j]
+
+    # print(a)
+    # print(fonte)
+
     src = src.replace('./src/', '')
-    histo = histograma(a, data, src)
-    print(f"\nEntropia {src.replace('./src/', '')}: {entropia(histo, data)}\n")
-
-def analyseTxt(src):
-    a = [chr(i) for i in range(65, 91)] + [chr(i) for i in range(97, 123)] # alfabeto de a-zA-Z para .txt
-
-    fonte = open('./src/lyrics.txt', 'r').read() # string com todo o texto
-
-    src = src.replace('./src/', '')
-    histo = histograma(a, fonte, src) # aqui vai percorrer a string como se fosse um array
-    print(f"\nEntropia {src}: {entropia(histo, fonte)}\n")
+    histo = histograma(a, fonte, src)
+    print(histo)
+    # print(f"Entropia {src}: {entropia(histo, fonte)}")
 
 
 #!              ------   Main    ------
 def main():
-    '''Section for .bmp files'''
-    # landscape
-    analyseImage('./src/landscape.bmp')
-
-    # MRI
-    analyseImage('./src/MRI.bmp')
-    
-    # MRIbin
-    analyseImage('./src/MRIbin.bmp')
-
-    '''Section for .wav files'''
-    # soundMono
-    analyseWav('./src/soundMono.wav')
-
-    '''Section for .txt files'''
-    # lyrics
-    analyseTxt('./src/lyrics.txt')
+    files = ['./src/landscape.bmp', './src/MRI.bmp', './src/MRIbin.bmp', './src/soundMono.wav', './src/lyrics.txt']
+    for file in files:
+        analyseFile(file)
+        # analyseHuffman(file)
+        pass
+    # analyseFilePairs('./src/lyrics.txt')
 
 main()
