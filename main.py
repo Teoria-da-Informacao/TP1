@@ -1,3 +1,4 @@
+import time
 from typing import Counter
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
@@ -25,7 +26,7 @@ def histograma(a, fonte, src): # (alfabeto, fonte, src)
 
     plt.show()
 
-    return histo # return dicionário
+    return histo # return histograma (dicionario)
 
 #! ex 2
 def entropia(histo, fonte):
@@ -35,7 +36,7 @@ def entropia(histo, fonte):
 
     p_i = np.array(list(histo.values()))/len(fonte)
 
-    return -np.sum(p_i*np.log2(p_i))
+    return -np.nansum(p_i*np.log2(p_i))
 
 
 #! ex 3
@@ -58,31 +59,51 @@ def analyseFile(src):
     print(f"Entropia {src}: {entropia(histo, fonte)}")
 
 #! ex 4
+def mediaP(ocorrencias, lenghts):
+    return np.divide(np.sum(np.multiply(ocorrencias, lenghts)), np.sum(ocorrencias))
+
+# TODO: variancia ponderada
+
 def analyseHuffman(src):
     fonte = getFonte(src)
+    ocorrencias = list(Counter(fonte).values())
+
     codec = HuffmanCodec.from_data(fonte)
-    t = codec.get_code_table()
-    # print(t)
     symbols, lenght = codec.get_code_len()
-    # print(symbols)
-    # print(lenght)
-    media = sum(lenght)/len(lenght)
-    print(f"Media: {media}\n")
+
+    media = mediaP(ocorrencias, lenght)
+    print(media)
 
 #! ex 5
+'''
+    * [0, 0, 2, 0, 1, 0 ,2 , 0, 0, 2, 0, 0]
+    *   0 = 8/12
+    *   1 = 1/12
+    *   2 = 3/12
+    ! juntar em de 2 bits
+'''
+
+def histogramaPairs(fonte, src): # (alfabeto, fonte, src)
+    fonte = Counter(fonte)
+
+    # mostra o histograma gráfico
+    plt.title(src)
+
+    plt.bar([(str(i[0])+', '+str(i[1])) for i in fonte.keys()], fonte.values())
+    plt.xticks([])
+    plt.show()
+
+    return fonte # return histograma (dicionario)
+
 def analyseFilePairs(src):
     fonte = getFonte(src)
-    fonte = [str(fonte[i]) + str(fonte[i+1]) for i in range(0, len(fonte)-1, 2)] # demora um bocadinho lol
-
-    # gera alfabeto com todos os pares possíveis
-    a = [] if not src.endswith('.txt') else [chr(i) + chr(j) for i in range(65, 91) for j in range(65, 91) ] + [chr(i) + chr(j) for i in range(97, 123) for j in range(97, 123) if i != j]
-
-    # print(a)
-    # print(fonte)
+    fonte = np.array(fonte).reshape((-1, 2))
+    fonte = tuple(map(tuple, fonte))
 
     src = src.replace('./src/', '')
-    histo = histograma(a, fonte, src)
-    print(histo)
+    histo = histogramaPairs(fonte, src)
+
+
     # print(f"Entropia {src}: {entropia(histo, fonte)}")
 
 
@@ -90,9 +111,9 @@ def analyseFilePairs(src):
 def main():
     files = ['./src/landscape.bmp', './src/MRI.bmp', './src/MRIbin.bmp', './src/soundMono.wav', './src/lyrics.txt']
     for file in files:
-        analyseFile(file)
+        # analyseFile(file)
         # analyseHuffman(file)
+        # analyseFilePairs(file)
         pass
-    # analyseFilePairs('./src/lyrics.txt')
 
 main()
