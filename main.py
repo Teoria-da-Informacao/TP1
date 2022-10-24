@@ -50,70 +50,99 @@ def getFonte(src):
         fonte = [i for i in fonte if i.isalpha()] # remove todos os caracteres que não são letras (não é optimizado)
     return fonte
 
+def getAlfabeto(src):
+    if src.endswith('.bmp'):
+        return [i for i in range(256)]
+    elif src.endswith('.wav'):
+        return [i for i in range(256)]
+    elif src.endswith('.txt'):
+        return [chr(i) for i in range(65, 91)] + [chr(i) for i in range(97, 123)]
+
 def analyseFile(src):
     fonte = getFonte(src)
-    a = [i for i in range(256)] if not src.endswith('.txt') else [chr(i) for i in range(65, 91)] + [chr(i) for i in range(97, 123)]
+    a = getAlfabeto(src)
 
     src = src.replace('./src/', '')
     histo = histograma(a, fonte, src)
     print(f"Entropia {src}: {entropia(histo, fonte)}")
 
 #! ex 4
-def mediaP(ocorrencias, lenghts):
-    return np.divide(np.sum(np.multiply(ocorrencias, lenghts)), np.sum(ocorrencias))
+def mediaP(ocorrencias, length):
+    return np.divide(np.sum(np.multiply(ocorrencias, length)), np.sum(ocorrencias))
 
-# TODO: variancia ponderada
+def varianciaP(ocorrencias, length):
+    return np.divide(np.sum(np.multiply(ocorrencias, np.power(length, 2))), np.sum(ocorrencias)) - np.power(mediaP(ocorrencias, length), 2)
 
 def analyseHuffman(src):
-    fonte = getFonte(src)
-    ocorrencias = list(Counter(fonte).values())
+    fonte = Counter(getFonte(src))
 
     codec = HuffmanCodec.from_data(fonte)
-    symbols, lenght = codec.get_code_len()
+    symbols, length = codec.get_code_len()
 
-    media = mediaP(ocorrencias, lenght)
-    print(media)
+
+    # ordena as keys da fonte em relação symbols
+    temp = {k: fonte[k] for k in symbols}
+    fonte = temp
+
+    print(fonte.keys())
+    print(symbols)
+    
+    ocorrencias = np.array(list(fonte.values()))
+
+    src.replace('./src/', '')
+
+    print(f'Média ponderada de {src}: {mediaP(ocorrencias, length)}')
+    print(f'Variancia ponderada de {src}: {varianciaP(ocorrencias, length)}')
 
 #! ex 5
-'''
-    * [0, 0, 2, 0, 1, 0 ,2 , 0, 0, 2, 0, 0]
-    *   0 = 8/12
-    *   1 = 1/12
-    *   2 = 3/12
-    ! juntar em de 2 bits
-'''
+def getAlfabetoPairs(src):
+    if src.endswith('.bmp'):
+        return [i for i in range(0, 2**16)]
+    elif src.endswith('.wav'):
+        return [i for i in range(0, 2**16)]
+    elif src.endswith('.txt'):
+        return [np.unicode_(chr(i)+chr(j)) for i in range(65, 91) for j in range(65, 91)] + [np.unicode_(chr(i)+chr(j)) for i in range(97, 123) for j in range(97, 123)]
 
 def histogramaPairs(fonte, src): # (alfabeto, fonte, src)
     fonte = Counter(fonte)
+    a = getAlfabetoPairs(src)
+    histo = {letra: 0 for letra in a}
+
+    for letra in fonte:
+        if letra in histo:
+            histo[letra] = fonte[letra]
 
     # mostra o histograma gráfico
     plt.title(src)
 
-    plt.bar([(str(i[0])+', '+str(i[1])) for i in fonte.keys()], fonte.values())
-    plt.xticks([])
+    plt.bar(histo.keys(), histo.values())
+
+    plt.xticks([]) # para de mostrar os valores do eixo x
+
     plt.show()
 
-    return fonte # return histograma (dicionario)
+    return histo # return histograma (dicionario)
 
 def analyseFilePairs(src):
     fonte = getFonte(src)
-    fonte = np.array(fonte).reshape((-1, 2))
-    fonte = tuple(map(tuple, fonte))
+    if src.endswith('.txt'):
+        fonte = [np.unicode_(fonte[i]+fonte[i+1]) for i in range(0, len(fonte)-1, 2)]
+    else:
+        fonte = [((fonte[i] << 8) + fonte[i+1]) for i in range(0, len(fonte) - 1, 2)]
 
     src = src.replace('./src/', '')
     histo = histogramaPairs(fonte, src)
 
-
     # print(f"Entropia {src}: {entropia(histo, fonte)}")
-
 
 #!              ------   Main    ------
 def main():
     files = ['./src/landscape.bmp', './src/MRI.bmp', './src/MRIbin.bmp', './src/soundMono.wav', './src/lyrics.txt']
     for file in files:
         # analyseFile(file)
-        # analyseHuffman(file)
+        analyseHuffman(file)
         # analyseFilePairs(file)
         pass
+    # analyseFilePairs('./src/soundMono.wav')
 
 main()
