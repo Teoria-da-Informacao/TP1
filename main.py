@@ -29,7 +29,6 @@ def entropia(fonte):
     pi = np.divide(count, len(fonte))
     return -np.sum(pi*np.log2(pi))
 
-
 #! ex 3
 def getFonte(src):
     if src.endswith('.bmp'):
@@ -53,7 +52,7 @@ def analyseFile(src):
 
     src = src.replace('./src/', '')
     histograma(a, fonte, src)
-    print(f"Entropia de {src}: {entropia(fonte, src)}")
+    print(f"Entropia de {src}: {entropia(fonte)}")
 
 #! ex 4
 def mediaP(ocorrencias, length): # Média ponderada
@@ -68,11 +67,12 @@ def analyseHuffman(src):
     codec = HuffmanCodec.from_data(fonte)
     symbols, length = codec.get_code_len()
 
-    # ordena as keys da fonte em relação symbols (temp é a nova fonte ordenada)
-    temp = {k: fonte[k] for k in symbols}
-    ocorrencias = np.array(list(temp.values()))
+    print(length)
 
-    src.replace('./src/', '')
+    # ordena as keys da fonte em relação symbols
+    ocorrencias = [fonte[k] for k in symbols]
+
+    src = src.replace('./src/', '')
     print(f'Média ponderada de {src}: {mediaP(ocorrencias, length)}')
     print(f'Variancia ponderada de {src}: {varianciaP(ocorrencias, length)}')
 
@@ -90,11 +90,11 @@ def analyseFilePairs(src):
     else:
         fonte = [((fonte[i] << 8) + fonte[i+1]) for i in range(0, len(fonte) - 1, 2)]
 
-    histo = histograma(getAlfabetoPairs(src), fonte) #! não sei se é necessário o histograma
+    # histo = histograma(getAlfabetoPairs(src), fonte) #! não sei se é necessário o histograma
     print(f"Entropia em pares de {src.replace('./src/', '')}: {entropia(fonte) / 2}")
 
 #! ex 6
-def mutalInformation(query, target, a, step): # alfabeto é inutil
+def mutalInformation(query, target, a, step):
     mutual = []
     for i in range(0, len(target), step):
         if i + len(query) > len(target):
@@ -107,8 +107,6 @@ def mutalInformation(query, target, a, step): # alfabeto é inutil
         mutual.append(entropia(x) + entropia(y) - entropia(xy))
     return np.array(mutual)
 
-
-
 #!              ------   Main    ------
 def main():
     files = ['./src/landscape.bmp', './src/MRI.bmp', './src/MRIbin.bmp', './src/soundMono.wav', './src/lyrics.txt']
@@ -118,13 +116,22 @@ def main():
         # analyseFilePairs(file)
         pass
 
-    # ex 6
-    query = np.array([2, 6, 4, 10, 5, 9, 5, 8, 0, 8])
-    target = np.array([6, 8, 9, 7, 2, 4, 9, 9, 4, 9, 1, 4, 8, 0, 1, 2, 2, 6, 3, 2, 0, 7, 4, 9, 5, 4, 8, 5, 2, 7, 8, 0, 7, 4, 8, 5, 7, 4, 3, 2, 2, 7, 3, 5, 2, 7, 4, 9, 9, 6])
-    alfabeto = [i for i in range(11)]
-    passo = 1
-    infoMutua = mutalInformation(query, target, alfabeto, passo)
-    print(infoMutua)
-    # print(len(infoMutua))
+    #! ex 6
+    #* a)
+    # query = np.array([2, 6, 4, 10, 5, 9, 5, 8, 0, 8])
+    # target = np.array([6, 8, 9, 7, 2, 4, 9, 9, 4, 9, 1, 4, 8, 0, 1, 2, 2, 6, 3, 2, 0, 7, 4, 9, 5, 4, 8, 5, 2, 7, 8, 0, 7, 4, 8, 5, 7, 4, 3, 2, 2, 7, 3, 5, 2, 7, 4, 9, 9, 6])
+    # alfabeto = [i for i in range(11)]
+    # passo = 1
+    # infoMutua = mutalInformation(query, target, alfabeto, passo)
+    # print(infoMutua)
+
+    #* b)
+    query = np.hsplit(getFonte('./src/MI/saxriff.wav'), 2)[0].flatten()
+    target01 = np.hsplit(getFonte('./src/MI/target01 - repeat.wav'), 2)[0].flatten()
+    # target02 = getFonte('./src/MI/target02 - repeatNoise.wav')
+    passo = round(len(query) / 4)
+    infoMutua01 = mutalInformation(query, target01, getAlfabeto('./src/MI/saxriff.wav'), passo)
+    print(infoMutua01)
+
 
 main()
