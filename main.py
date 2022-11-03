@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from scipy.io import wavfile
 import numpy as np
-
 from Classes.huffmancodec import *
 
 #! ex 1
@@ -67,8 +66,6 @@ def analyseHuffman(src):
     codec = HuffmanCodec.from_data(fonte)
     symbols, length = codec.get_code_len()
 
-    print(length)
-
     # ordena as keys da fonte em relação symbols
     ocorrencias = [fonte[k] for k in symbols]
 
@@ -100,38 +97,77 @@ def mutalInformation(query, target, a, step):
         if i + len(query) > len(target):
             break
 
-        x = [i for i in query if i in a] # filtra os caracteres que não estão no alfabeto
-        y = [i for i in target[i:i+len(query)] if i in a] # filtra os caracteres que não estão no alfabeto
+        x = query[np.isin(query, a)] # filtra os caracteres que não estão no alfabeto
+        y = target[i:i+len(query)][np.isin(target[i:i+len(query)], a)] # filtra os caracteres que não estão no alfabeto
         xy = [((x[i] << 8) + y[i]) for i in range(0, len(x))] # junta os caracteres em pares
 
         mutual.append(entropia(x) + entropia(y) - entropia(xy))
     return np.array(mutual)
 
+def evoluçãoInformaçãoMutua(info, title):
+    plt.title(title.replace('./src/MI/', ''))
+    plt.plot(info)
+    plt.show()
+
+#? Alinea A
+def alineaA():
+    query = np.array([2, 6, 4, 10, 5, 9, 5, 8, 0, 8])
+    target = np.array([6, 8, 9, 7, 2, 4, 9, 9, 4, 9, 1, 4, 8, 0, 1, 2, 2, 6, 3, 2, 0, 7, 4, 9, 5, 4, 8, 5, 2, 7, 8, 0, 7, 4, 8, 5, 7, 4, 3, 2, 2, 7, 3, 5, 2, 7, 4, 9, 9, 6])
+    alfabeto = [i for i in range(11)]
+    passo = 1
+    infoMutua = mutalInformation(query, target, alfabeto, passo)
+    print(infoMutua)
+
+#? Alinea B
+def alineaB():
+    query = np.hsplit(getFonte('./src/MI/saxriff.wav'), 2)[0].flatten()
+    target01 = np.hsplit(getFonte('./src/MI/target01 - repeat.wav'), 2)[0].flatten()
+    target02 = np.hsplit(getFonte('./src/MI/target02 - repeatNoise.wav'), 2)[0].flatten()
+    passo = round(len(query) / 4)
+    alfa = getAlfabeto('./src/MI/saxriff.wav')
+    infoMutua01 = mutalInformation(query, target01, alfa, passo)
+    infoMutua02 = mutalInformation(query, target02, alfa, passo)
+    print(infoMutua01)
+    print(infoMutua02)
+    evoluçãoInformaçãoMutua(infoMutua01, './src/MI/saxriff.wav')
+    evoluçãoInformaçãoMutua(infoMutua02, './src/MI/saxriff.wav')
+
+#? Alinea C
+def infoMaximos(songs, query, alfa, passo):
+    maximos = {song.replace('./src/MI/', ''): 0 for song in songs}
+    for song in songs:
+        target = getFonte(song)
+        if len(target.shape) == 2: # verifica se target é um array de 2 dimensões
+            target = np.hsplit(target, 2)[0].flatten()
+        infoMutua = mutalInformation(query, target, alfa, passo)
+        maximos[song.replace('./src/MI/', '')] = np.max(infoMutua)
+    # ordena maximos
+    maximos = {k: v for k, v in sorted(maximos.items(), key=lambda item: item[1], reverse=True)}
+    return maximos
+
+
 #!              ------   Main    ------
 def main():
     files = ['./src/landscape.bmp', './src/MRI.bmp', './src/MRIbin.bmp', './src/soundMono.wav', './src/lyrics.txt']
     for file in files:
-        # analyseFile(file)
-        # analyseHuffman(file)
-        # analyseFilePairs(file)
-        pass
+        analyseFile(file)
+        analyseHuffman(file)
+        analyseFilePairs(file)
+        print('#################################')
 
-    #! ex 6
-    #* a)
-    # query = np.array([2, 6, 4, 10, 5, 9, 5, 8, 0, 8])
-    # target = np.array([6, 8, 9, 7, 2, 4, 9, 9, 4, 9, 1, 4, 8, 0, 1, 2, 2, 6, 3, 2, 0, 7, 4, 9, 5, 4, 8, 5, 2, 7, 8, 0, 7, 4, 8, 5, 7, 4, 3, 2, 2, 7, 3, 5, 2, 7, 4, 9, 9, 6])
-    # alfabeto = [i for i in range(11)]
-    # passo = 1
-    # infoMutua = mutalInformation(query, target, alfabeto, passo)
-    # print(infoMutua)
+    #? 6 a)
+    alineaA()
+    print('#################################')
 
-    #* b)
+    #? 6 b)
+    alineaB()
+    print('#################################')
+
+    #? 6 c)
     query = np.hsplit(getFonte('./src/MI/saxriff.wav'), 2)[0].flatten()
-    target01 = np.hsplit(getFonte('./src/MI/target01 - repeat.wav'), 2)[0].flatten()
-    # target02 = getFonte('./src/MI/target02 - repeatNoise.wav')
+    alfa = getAlfabeto('./src/MI/saxriff.wav')
     passo = round(len(query) / 4)
-    infoMutua01 = mutalInformation(query, target01, getAlfabeto('./src/MI/saxriff.wav'), passo)
-    print(infoMutua01)
-
+    songs = ['./src/MI/Song01.wav', './src/MI/Song02.wav', './src/MI/Song03.wav', './src/MI/Song04.wav', './src/MI/Song05.wav', './src/MI/Song06.wav', './src/MI/Song07.wav']
+    infoMaximos(songs, query, alfa, passo)
 
 main()
