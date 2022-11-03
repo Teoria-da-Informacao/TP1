@@ -168,6 +168,6 @@ def main():
     alfa = getAlfabeto('./src/MI/saxriff.wav')
     passo = round(len(query) / 4)
     songs = ['./src/MI/Song01.wav', './src/MI/Song02.wav', './src/MI/Song03.wav', './src/MI/Song04.wav', './src/MI/Song05.wav', './src/MI/Song06.wav', './src/MI/Song07.wav']
-    infoMaximos(songs, query, alfa, passo)
+    print(infoMaximos(songs, query, alfa, passo))
 
 main()
