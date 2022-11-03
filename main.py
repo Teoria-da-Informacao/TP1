@@ -104,7 +104,7 @@ def mutalInformation(query, target, a, step):
         mutual.append(entropia(x) + entropia(y) - entropia(xy))
     return np.array(mutual)
 
-def evoluçãoInformaçãoMutua(info, title):
+def evolucaoInformacaoMutua(info, title):
     plt.title(title.replace('./src/MI/', ''))
     plt.plot(info)
     plt.show()
@@ -129,8 +129,8 @@ def alineaB():
     infoMutua02 = mutalInformation(query, target02, alfa, passo)
     print(infoMutua01)
     print(infoMutua02)
-    evoluçãoInformaçãoMutua(infoMutua01, './src/MI/saxriff.wav')
-    evoluçãoInformaçãoMutua(infoMutua02, './src/MI/saxriff.wav')
+    evolucaoInformacaoMutua(infoMutua01, './src/MI/saxriff.wav')
+    evolucaoInformacaoMutua(infoMutua02, './src/MI/saxriff.wav')
 
 #? Alinea C
 def infoMaximos(songs, query, alfa, passo):
