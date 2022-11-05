@@ -35,7 +35,7 @@ def getFonte(src):
     elif src.endswith('.wav'):
         [temp, fonte] = wavfile.read(src)
     elif src.endswith('.txt'):
-        fonte = open('./src/lyrics.txt', 'r').read()
+        fonte = open(src, 'r').read()
         fonte = [i for i in fonte if i.isalpha()] # remove todos os caracteres que não são letras
     return fonte
 
@@ -166,11 +166,11 @@ def main():
         print('#################################')
 
     #? 6 alinea a)
-    # alineaA()
+    alineaA()
     print('#################################')
 
     #? 6 alinea b)
-    # alineaB()
+    alineaB()
     print('#################################')
 
     #? 6 alinea c)
