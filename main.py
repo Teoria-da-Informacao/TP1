@@ -86,8 +86,10 @@ def analyseFilePairs(src):
     else:
         # junta caracteres dando shift ao primeiro numero 8 bits os outro bits da direita são ocupados pelo segundo numero que depois dá apenas um número "original"
         fonte = [((fonte[i] << 8) + fonte[i+1]) for i in range(0, len(fonte) - 1, 2)]
-
-    print(f"Entropia em pares de {src.replace('./src/', '')}: {entropia(fonte) / 2}")
+    a = getAlfabetoPairs(src)
+    src = src.replace('./src/', '')
+    histograma(a, fonte, src)
+    print(f"Entropia em pares de {src}: {entropia(fonte) / 2}")
 
 #! ex 6
 def mutalInformation(query, target, a, step):
