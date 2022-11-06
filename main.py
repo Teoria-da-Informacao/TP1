@@ -6,7 +6,7 @@ import numpy as np
 from Classes.huffmancodec import *
 
 #! ex 1
-def histograma(a, fonte, title=None): # title é opcional para não mostrar o histograma gráfico
+def histograma(a, fonte, title): # title é opcional para não mostrar o histograma gráfico
     histo = {letra: 0 for letra in a} # cria dicionário todo a 0
     fonte = Counter(fonte) # função que conta o número de vez de cada simbolo aparece (retorna dicionário)
     
@@ -15,12 +15,9 @@ def histograma(a, fonte, title=None): # title é opcional para não mostrar o hi
         if letra in a:
             histo[letra] = fonte[letra]
 
-    if title != None: # mostra o histograma gráfico caso seja passado title a chamar a função
-        plt.title(title)
-        plt.bar(histo.keys(), histo.values())
-        plt.show()
-
-    # return histo '''Nunca é usado por isso é que está em comentário'''
+    plt.title(title)
+    plt.bar(histo.keys(), histo.values())
+    plt.show()
 
 #! ex 2
 def entropia(fonte):
