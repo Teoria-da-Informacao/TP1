@@ -87,8 +87,6 @@ def analyseFilePairs(src):
         # junta caracteres dando shift ao primeiro numero 8 bits os outro bits da direita são ocupados pelo segundo numero que depois dá apenas um número "original"
         fonte = [((fonte[i] << 8) + fonte[i+1]) for i in range(0, len(fonte) - 1, 2)]
 
-    # histo = histograma(getAlfabetoPairs(src), fonte) #! não sei se é necessário o histograma
-    # print(histo) #! tirar comentário do return da função histograma para usar
     print(f"Entropia em pares de {src.replace('./src/', '')}: {entropia(fonte) / 2}")
 
 #! ex 6
