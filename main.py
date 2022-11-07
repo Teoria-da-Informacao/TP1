@@ -6,7 +6,7 @@ import numpy as np
 from Classes.huffmancodec import *
 
 #! ex 1
-def histograma(a, fonte, title=None): # title é opcional para não mostrar o histograma gráfico
+def histograma(a, fonte, title): # title é opcional para não mostrar o histograma gráfico
     histo = {letra: 0 for letra in a} # cria dicionário todo a 0
     fonte = Counter(fonte) # função que conta o número de vez de cada simbolo aparece (retorna dicionário)
     
@@ -15,12 +15,9 @@ def histograma(a, fonte, title=None): # title é opcional para não mostrar o hi
         if letra in a:
             histo[letra] = fonte[letra]
 
-    if title != None: # mostra o histograma gráfico caso seja passado title a chamar a função
-        plt.title(title)
-        plt.bar(histo.keys(), histo.values())
-        plt.show()
-
-    # return histo '''Nunca é usado por isso é que está em comentário'''
+    plt.title(title)
+    plt.bar(histo.keys(), histo.values())
+    plt.show()
 
 #! ex 2
 def entropia(fonte):
@@ -89,10 +86,10 @@ def analyseFilePairs(src):
     else:
         # junta caracteres dando shift ao primeiro numero 8 bits os outro bits da direita são ocupados pelo segundo numero que depois dá apenas um número "original"
         fonte = [((fonte[i] << 8) + fonte[i+1]) for i in range(0, len(fonte) - 1, 2)]
-
-    # histo = histograma(getAlfabetoPairs(src), fonte) #! não sei se é necessário o histograma
-    # print(histo) #! tirar comentário do return da função histograma para usar
-    print(f"Entropia em pares de {src.replace('./src/', '')}: {entropia(fonte) / 2}")
+    a = getAlfabetoPairs(src)
+    src = src.replace('./src/', '')
+    histograma(a, fonte, src)
+    print(f"Entropia em pares de {src}: {entropia(fonte) / 2}")
 
 #! ex 6
 def mutalInformation(query, target, a, step):
